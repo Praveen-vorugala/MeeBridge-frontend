@@ -1,0 +1,87 @@
+<mat-sidenav-container class="h-screen bg-gray-50">
+  <mat-sidenav #sidenav mode="side" opened class="w-64 shadow-lg border-r border-gray-200 bg-white">
+    <div class="bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-6 text-center shadow-md">
+      <h2 class="text-2xl font-bold mb-1">MeeBridge</h2>
+      <p class="text-indigo-100 text-sm">Meeting Platform</p>
+    </div>
+    <mat-nav-list class="p-2">
+      <a mat-list-item routerLink="/dashboard" routerLinkActive="active" 
+         class="mb-1 rounded-lg transition-all duration-200"
+         [class.bg-indigo-100]="isActive('/dashboard')"
+         [class.text-indigo-700]="isActive('/dashboard')"
+         [class.hover:bg-indigo-50]="!isActive('/dashboard')"
+         [class.font-semibold]="isActive('/dashboard')">
+        <mat-icon class="mr-3" [class.text-indigo-600]="!isActive('/dashboard')" [class.text-indigo-700]="isActive('/dashboard')">dashboard</mat-icon>
+        <span [class.text-gray-700]="!isActive('/dashboard')" [class.text-indigo-900]="isActive('/dashboard')">Dashboard</span>
+      </a>
+      <a mat-list-item routerLink="/builder" routerLinkActive="active"
+         class="mb-1 rounded-lg transition-all duration-200"
+         [class.bg-green-100]="isActive('/builder')"
+         [class.text-green-700]="isActive('/builder')"
+         [class.hover:bg-green-50]="!isActive('/builder')"
+         [class.font-semibold]="isActive('/builder')">
+        <mat-icon class="mr-3" [class.text-green-600]="!isActive('/builder')" [class.text-green-700]="isActive('/builder')">build</mat-icon>
+        <span [class.text-gray-700]="!isActive('/builder')" [class.text-green-900]="isActive('/builder')">Page Builder</span>
+      </a>
+      <a mat-list-item routerLink="/calendar" routerLinkActive="active"
+         class="mb-1 rounded-lg transition-all duration-200"
+         [class.bg-blue-100]="isActive('/calendar')"
+         [class.text-blue-700]="isActive('/calendar')"
+         [class.hover:bg-blue-50]="!isActive('/calendar')"
+         [class.font-semibold]="isActive('/calendar')">
+        <mat-icon class="mr-3" [class.text-blue-600]="!isActive('/calendar')" [class.text-blue-700]="isActive('/calendar')">calendar_today</mat-icon>
+        <span [class.text-gray-700]="!isActive('/calendar')" [class.text-blue-900]="isActive('/calendar')">Availability</span>
+      </a>
+      <a mat-list-item routerLink="/admin/dashboard" routerLinkActive="active" 
+         class="mb-1 rounded-lg transition-all duration-200"
+         [class.bg-red-100]="isActive('/admin/dashboard')"
+         [class.text-red-700]="isActive('/admin/dashboard')"
+         [class.hover:bg-red-50]="!isActive('/admin/dashboard')"
+         [class.font-semibold]="isActive('/admin/dashboard')">
+        <mat-icon class="mr-3" [class.text-red-600]="!isActive('/admin/dashboard')" [class.text-red-700]="isActive('/admin/dashboard')">admin_panel_settings</mat-icon>
+        <span [class.text-gray-700]="!isActive('/admin/dashboard')" [class.text-red-900]="isActive('/admin/dashboard')">Admin</span>
+      </a>
+      <a mat-list-item routerLink="/admin/meeting-pages" routerLinkActive="active"
+         class="mb-1 rounded-lg transition-all duration-200"
+         [class.bg-purple-100]="isActive('/admin/meeting-pages')"
+         [class.text-purple-700]="isActive('/admin/meeting-pages')"
+         [class.hover:bg-purple-50]="!isActive('/admin/meeting-pages')"
+         [class.font-semibold]="isActive('/admin/meeting-pages')">
+        <mat-icon class="mr-3" [class.text-purple-600]="!isActive('/admin/meeting-pages')" [class.text-purple-700]="isActive('/admin/meeting-pages')">description</mat-icon>
+        <span [class.text-gray-700]="!isActive('/admin/meeting-pages')" [class.text-purple-900]="isActive('/admin/meeting-pages')">Meeting Pages</span>
+      </a>
+      <a mat-list-item routerLink="/admin/customers" routerLinkActive="active"
+         class="mb-1 rounded-lg transition-all duration-200"
+         [class.bg-teal-100]="isActive('/admin/customers')"
+         [class.text-teal-700]="isActive('/admin/customers')"
+         [class.hover:bg-teal-50]="!isActive('/admin/customers')"
+         [class.font-semibold]="isActive('/admin/customers')">
+        <mat-icon class="mr-3" [class.text-teal-600]="!isActive('/admin/customers')" [class.text-teal-700]="isActive('/admin/customers')">people</mat-icon>
+        <span [class.text-gray-700]="!isActive('/admin/customers')" [class.text-teal-900]="isActive('/admin/customers')">Customers</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="bg-gray-50">
+    <mat-toolbar class="sticky top-0 z-50 shadow-md bg-gradient-to-br from-indigo-600 to-purple-600">
+      <button mat-icon-button (click)="sidenav.toggle()" class="text-white hover:bg-white hover:bg-opacity-20">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="flex-1"></span>
+      <span *ngIf="user" class="text-white font-medium mr-4 hidden md:block">{{ user.email }}</span>
+      <button mat-icon-button [matMenuTriggerFor]="menu" class="text-white hover:bg-white hover:bg-opacity-20">
+        <mat-icon class="invert-[1]">account_circle</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu" class="shadow-xl">
+        <button mat-menu-item (click)="logout()" class="hover:bg-red-50">
+          <mat-icon class="text-red-600">logout</mat-icon>
+          <span class="ml-2">Logout</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+    <div class="min-h-screen">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+

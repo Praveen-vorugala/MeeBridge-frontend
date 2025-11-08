@@ -1,0 +1,212 @@
+<ng-container *ngIf="!loading; else loadingState">
+  <div class="max-w-6xl mx-auto py-10 px-4 md:px-8">
+    <div class="mb-8 text-center">
+      <h1 class="text-3xl font-bold text-gray-900" *ngIf="meetingPage">{{ meetingPage.title }}</h1>
+      <p class="text-gray-600" *ngIf="meetingPage?.description">{{ meetingPage?.description }}</p>
+    </div>
+
+    <div *ngIf="!submitted; else successState" class="space-y-6">
+      <div class="flex items-center justify-center gap-6">
+        <div class="flex items-center gap-2">
+          <span class="flex items-center justify-center w-10 h-10 rounded-full text-white font-semibold"
+                [class.bg-indigo-600]="currentStep === 1"
+                [class.bg-indigo-300]="currentStep !== 1">1</span>
+          <span class="font-semibold" [class.text-indigo-600]="currentStep === 1">Select date & time</span>
+        </div>
+        <div class="flex-1 h-px bg-gray-200"></div>
+        <div class="flex items-center gap-2">
+          <span class="flex items-center justify-center w-10 h-10 rounded-full text-white font-semibold"
+                [class.bg-indigo-600]="currentStep === 2"
+                [class.bg-indigo-300]="currentStep !== 2">2</span>
+          <span class="font-semibold" [class.text-indigo-600]="currentStep === 2">Enter details</span>
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 1" class="bg-white shadow-xl border border-gray-200 rounded-3xl overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2">
+          <div class="p-6 lg:p-8 border-b lg:border-b-0 lg:border-r border-gray-200" [formGroup]="slotForm">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Select a date and time</h2>
+            <mat-calendar [selected]="slotForm.get('date')?.value"
+                          [minDate]="minBookingDate"
+                          (selectedChange)="onCalendarDateSelected($event)"></mat-calendar>
+
+            <div class="mt-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Time zone</label>
+              <mat-form-field appearance="outline" class="w-full">
+                <mat-select formControlName="timezone">
+                  <mat-option *ngFor="let zone of timezones" [value]="zone.value">
+                    {{ zone.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="mt-6">
+              <h3 class="text-sm font-semibold text-gray-800 uppercase tracking-wide mb-3">Available times</h3>
+              <div *ngIf="selectedDateIso; else selectDateHint">
+                <div *ngIf="availableSlots.length > 0; else noSlots" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                  <button type="button"
+                          *ngFor="let slot of availableSlots"
+                          (click)="selectTime(slot)"
+                          class="w-full h-10 rounded-lg border transition font-medium"
+                          [class.bg-indigo-600]="isSlotSelected(slot)"
+                          [class.text-white]="isSlotSelected(slot)"
+                          [class.border-indigo-600]="isSlotSelected(slot)"
+                          [class.text-indigo-600]="!isSlotSelected(slot)"
+                          [class.border-indigo-200]="!isSlotSelected(slot)"
+                          [class.hover:bg-indigo-50]="!isSlotSelected(slot)">
+                    {{ slot.display }}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <ng-template #selectDateHint>
+              <p class="text-sm text-gray-500 mt-2">Choose a date to view available time slots.</p>
+            </ng-template>
+            <ng-template #noSlots>
+              <p class="text-sm text-gray-500">No slots available for the selected date. Please choose another date.</p>
+            </ng-template>
+          </div>
+
+          <div class="p-6 lg:p-8 bg-gray-50 flex flex-col justify-between">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-900 mb-4">Selection summary</h2>
+              <div class="space-y-3 text-sm text-gray-700">
+                <div>
+                  <p class="font-medium text-gray-800">Date</p>
+                  <p>{{ slotForm.get('date')?.value ? (slotForm.get('date')?.value | date:'fullDate') : 'Not selected' }}</p>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">Time</p>
+                  <p>{{ selectedSlotDisplay || 'Not selected' }}</p>
+                </div>
+                <div>
+                  <p class="font-medium text-gray-800">Time zone</p>
+                  <p>{{ getTimezoneLabel(slotForm.get('timezone')?.value) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+              <button type="button"
+                      (click)="continueToStep2()"
+                      class="inline-flex items-center h-11 px-6 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-lg hover:shadow-xl transition disabled:opacity-50"
+                      [disabled]="slotForm.invalid || !selectedSlotDisplay">
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="currentStep === 2" class="bg-white shadow-xl border border-gray-200 rounded-3xl overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2">
+          <aside class="p-6 lg:p-8 bg-gray-50 border-b lg:border-b-0 lg:border-r border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Scheduled details</h2>
+            <div class="space-y-3 text-sm text-gray-700">
+              <div>
+                <p class="font-medium text-gray-800">Date</p>
+                <p>{{ slotForm.get('date')?.value | date:'fullDate' }}</p>
+              </div>
+              <div>
+                <p class="font-medium text-gray-800">Time</p>
+                <p>{{ selectedSlotDisplay }}</p>
+              </div>
+              <div>
+                <p class="font-medium text-gray-800">Time zone</p>
+                <p>{{ getTimezoneLabel(slotForm.get('timezone')?.value) }}</p>
+              </div>
+            </div>
+            <button type="button" (click)="goBackToStep1()"
+                    class="mt-6 inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              Change selection
+            </button>
+          </aside>
+
+          <section class="p-6 lg:p-8">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Tell us about yourself</h2>
+            <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" class="space-y-4">
+              <div *ngFor="let field of meetingPage?.fields">
+                <ng-container [ngSwitch]="field.type">
+                  <mat-form-field appearance="outline" class="w-full" *ngSwitchCase="'text'">
+                    <mat-label>{{ field.label }}</mat-label>
+                    <input matInput [formControlName]="field.name" type="text" [required]="field.required">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="w-full" *ngSwitchCase="'email'">
+                    <mat-label>{{ field.label }}</mat-label>
+                    <input matInput [formControlName]="field.name" type="email" [required]="field.required">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="w-full" *ngSwitchCase="'phone'">
+                    <mat-label>{{ field.label }}</mat-label>
+                    <input matInput [formControlName]="field.name" type="tel" [required]="field.required">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="w-full" *ngSwitchCase="'textarea'">
+                    <mat-label>{{ field.label }}</mat-label>
+                    <textarea matInput [formControlName]="field.name" [required]="field.required"></textarea>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="w-full" *ngSwitchCase="'date'">
+                    <mat-label>{{ field.label }}</mat-label>
+                    <input matInput [matDatepicker]="detailPicker" [formControlName]="field.name" [required]="field.required">
+                    <mat-datepicker-toggle matSuffix [for]="detailPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #detailPicker></mat-datepicker>
+                  </mat-form-field>
+
+                  <mat-checkbox *ngSwitchCase="'checkbox'" [formControlName]="field.name">
+                    {{ field.label }}
+                  </mat-checkbox>
+
+                  <mat-form-field appearance="outline" class="w-full" *ngSwitchCase="'dropdown'">
+                    <mat-label>{{ field.label }}</mat-label>
+                    <mat-select [formControlName]="field.name" [required]="field.required">
+                      <mat-option *ngFor="let option of field.options" [value]="option">{{ option }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="w-full" *ngSwitchDefault>
+                    <mat-label>{{ field.label }}</mat-label>
+                    <input matInput [formControlName]="field.name" [required]="field.required">
+                  </mat-form-field>
+                </ng-container>
+              </div>
+
+              <div class="flex justify-end gap-3 pt-4">
+                <button type="button" (click)="goBackToStep1()"
+                        class="inline-flex items-center h-11 px-5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition">
+                  Back
+                </button>
+                <button type="submit"
+                        class="inline-flex items-center h-11 px-6 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-lg hover:shadow-xl transition disabled:opacity-50"
+                        [disabled]="bookingForm.invalid || slotForm.invalid">
+                  Schedule
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #successState>
+  <div class="max-w-3xl mx-auto text-center bg-white shadow-lg border border-gray-200 rounded-2xl p-10">
+    <svg class="w-14 h-14 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <h2 class="text-2xl font-bold text-gray-900 mb-2">Booking confirmed!</h2>
+    <p class="text-gray-600">You will receive a confirmation email shortly with all the meeting details.</p>
+  </div>
+</ng-template>
+
+<ng-template #loadingState>
+  <div class="flex items-center justify-center py-24">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+</ng-template>

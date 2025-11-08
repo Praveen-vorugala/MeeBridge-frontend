@@ -1,0 +1,115 @@
+.builder-container {
+  padding: 20px;
+}
+
+.page-selector-card {
+  margin-bottom: 20px;
+}
+
+.form-section, .fields-section {
+  margin-bottom: 30px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.field-item {
+  margin-bottom: 15px;
+}
+
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.field-row mat-form-field {
+  flex: 1 1 200px;
+  min-width: 150px;
+}
+
+.field-row mat-checkbox {
+  margin-top: 8px;
+}
+
+.dropdown-options {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.dropdown-options h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  background-color: white;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.add-option {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  margin-top: 10px;
+}
+
+.add-option mat-form-field {
+  flex: 1;
+}
+
+.field-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 15px;
+}
+
+.actions {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.public-url {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.no-fields {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  margin-top: 20px;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.empty-state-card {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.empty-state-card p {
+  margin-bottom: 20px;
+}
+

@@ -1,0 +1,164 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6 lg:p-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6">
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
+      <p class="text-gray-600">Overview of your meeting bookings and statistics</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex items-center justify-center py-20">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+
+    <div *ngIf="!loading && analytics">
+      <!-- KPIs -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <mat-card class="shadow-lg border border-gray-200 hover:shadow-xl transition-shadow bg-gradient-to-br from-blue-50 to-blue-100">
+          <mat-card-content class="p-6">
+            <div class="flex items-center justify-between mb-2">
+              <mat-icon class="text-blue-600 text-3xl">bookings</mat-icon>
+            </div>
+            <div class="text-3xl font-bold text-gray-900 mb-1">{{ analytics.total_bookings }}</div>
+            <div class="text-sm text-gray-600 font-medium">Total Bookings</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="shadow-lg border border-gray-200 hover:shadow-xl transition-shadow bg-gradient-to-br from-green-50 to-green-100">
+          <mat-card-content class="p-6">
+            <div class="flex items-center justify-between mb-2">
+              <mat-icon class="text-green-600 text-3xl">check_circle</mat-icon>
+            </div>
+            <div class="text-3xl font-bold text-gray-900 mb-1">{{ analytics.total_completed }}</div>
+            <div class="text-sm text-gray-600 font-medium">Completed</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="shadow-lg border border-gray-200 hover:shadow-xl transition-shadow bg-gradient-to-br from-red-50 to-red-100">
+          <mat-card-content class="p-6">
+            <div class="flex items-center justify-between mb-2">
+              <mat-icon class="text-red-600 text-3xl">cancel</mat-icon>
+            </div>
+            <div class="text-3xl font-bold text-gray-900 mb-1">{{ analytics.total_cancellations }}</div>
+            <div class="text-sm text-gray-600 font-medium">Cancelled</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="shadow-lg border border-gray-200 hover:shadow-xl transition-shadow bg-gradient-to-br from-purple-50 to-purple-100">
+          <mat-card-content class="p-6">
+            <div class="flex items-center justify-between mb-2">
+              <mat-icon class="text-purple-600 text-3xl">trending_up</mat-icon>
+            </div>
+            <div class="text-3xl font-bold text-gray-900 mb-1">{{ analytics.average_booking_rate_per_week }}</div>
+            <div class="text-sm text-gray-600 font-medium">Avg Bookings/Week</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="shadow-lg border border-gray-200 hover:shadow-xl transition-shadow bg-gradient-to-br from-orange-50 to-orange-100">
+          <mat-card-content class="p-6">
+            <div class="flex items-center justify-between mb-2">
+              <mat-icon class="text-orange-600 text-3xl">event</mat-icon>
+            </div>
+            <div class="text-3xl font-bold text-gray-900 mb-1">{{ analytics.upcoming_meetings_count }}</div>
+            <div class="text-sm text-gray-600 font-medium">Upcoming Meetings</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <mat-card class="shadow-lg border border-gray-200">
+          <mat-card-header class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 border-b border-gray-200">
+            <mat-card-title class="text-xl font-semibold text-gray-800 flex items-center">
+              <mat-icon class="mr-2 text-blue-600">show_chart</mat-icon>
+              Daily Statistics
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="p-6">
+            <canvas baseChart
+              [data]="dailyChartData"
+              [options]="chartOptions"
+              [type]="'line'">
+            </canvas>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="shadow-lg border border-gray-200">
+          <mat-card-header class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 border-b border-gray-200">
+            <mat-card-title class="text-xl font-semibold text-gray-800 flex items-center">
+              <mat-icon class="mr-2 text-green-600">bar_chart</mat-icon>
+              Weekly Statistics
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="p-6">
+            <canvas baseChart
+              [data]="weeklyChartData"
+              [options]="chartOptions"
+              [type]="'bar'">
+            </canvas>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="shadow-lg border border-gray-200 lg:col-span-2">
+          <mat-card-header class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 border-b border-gray-200">
+            <mat-card-title class="text-xl font-semibold text-gray-800 flex items-center">
+              <mat-icon class="mr-2 text-purple-600">assessment</mat-icon>
+              Monthly Statistics
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="p-6">
+            <canvas baseChart
+              [data]="monthlyChartData"
+              [options]="chartOptions"
+              [type]="'bar'">
+            </canvas>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Upcoming Bookings -->
+      <mat-card class="shadow-lg border border-gray-200">
+        <mat-card-header class="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 border-b border-gray-200">
+          <mat-card-title class="text-xl font-semibold text-gray-800 flex items-center">
+            <mat-icon class="mr-2 text-indigo-600">upcoming</mat-icon>
+            Upcoming Bookings
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="p-0">
+          <mat-list>
+            <mat-list-item *ngFor="let booking of upcomingBookings" 
+                          class="border-b border-gray-100 hover:bg-gray-50 transition-colors px-6 py-4">
+              <div class="flex items-center justify-between w-full">
+                <div class="flex-1">
+                  <div class="font-semibold text-gray-900 text-lg mb-1">
+                    {{ booking.attendee_name || booking.attendee_email }}
+                  </div>
+                  <div class="text-sm text-gray-600 flex items-center">
+                    <mat-icon class="text-xs mr-1">schedule</mat-icon>
+                    {{ booking.date | date:'medium' }}
+                  </div>
+                </div>
+                <mat-chip [class]="'status-' + booking.status" 
+                         class="px-4 py-1 rounded-full text-sm font-semibold"
+                         [class.bg-green-100]="booking.status === 'booked'"
+                         [class.text-green-800]="booking.status === 'booked'"
+                         [class.bg-blue-100]="booking.status === 'completed'"
+                         [class.text-blue-800]="booking.status === 'completed'"
+                         [class.bg-red-100]="booking.status === 'cancelled'"
+                         [class.text-red-800]="booking.status === 'cancelled'">
+                  {{ booking.status }}
+                </mat-chip>
+              </div>
+            </mat-list-item>
+            <mat-list-item *ngIf="upcomingBookings.length === 0" class="py-12 text-center">
+              <div class="w-full text-gray-500">
+                <mat-icon class="text-5xl text-gray-300 mb-2">event_busy</mat-icon>
+                <p class="text-lg">No upcoming bookings</p>
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

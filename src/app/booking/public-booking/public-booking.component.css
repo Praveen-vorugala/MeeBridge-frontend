@@ -1,0 +1,23 @@
+.booking-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.success-message {
+  text-align: center;
+  padding: 40px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
