@@ -1,0 +1,91 @@
+<div class="calendar-wrapper" *ngIf="!loading; else loadingState">
+  <div class="calendar-header">
+    <div class="header-left">
+      <h1>Calendar</h1>
+      <span class="week-range">{{ getWeekRangeLabel() }}</span>
+    </div>
+    <div class="header-controls">
+      <button mat-icon-button (click)="changeWeek(-1)" aria-label="Previous week">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-button (click)="goToToday()">Today</button>
+      <button mat-icon-button (click)="changeWeek(1)" aria-label="Next week">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="calendar-content">
+    <div class="calendar-grid">
+      <div class="time-column">
+        <div class="time-cell" *ngFor="let hour of hours">
+          <span>{{ hour.label }}</span>
+        </div>
+      </div>
+      <div class="day-columns">
+        <div class="day-column" *ngFor="let day of weekDays">
+          <div class="day-header">
+            <div class="day-name">{{ day | date:'EEE' }}</div>
+            <div class="day-date">{{ day | date:'d MMM' }}</div>
+          </div>
+          <div class="day-body" [style.height.px]="(dayEndHour - dayStartHour) * 60 * minuteHeight">
+            <div class="hour-guides">
+              <div class="hour-line" *ngFor="let hour of hours"></div>
+            </div>
+            <div class="events">
+              <div class="event-card"
+                   *ngFor="let event of eventsForDay(day)"
+                   [ngStyle]="eventStyle(event)"
+                   (click)="openDetails($event, event)">
+                <div class="event-title">{{ event.title }}</div>
+                <div class="event-attendee">{{ event.attendeeName }}</div>
+                <div class="event-time">{{ event.start | date:'shortTime' }} - {{ event.end | date:'shortTime' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #eventDetailTemplate let-event>
+  <div class="overlay-card">
+    <div class="overlay-header">
+      <div>
+        <h2>{{ event.title }}</h2>
+        <p>{{ event.start | date:'fullDate' }} • {{ event.start | date:'shortTime' }} – {{ event.end | date:'shortTime' }}</p>
+      </div>
+      <button mat-icon-button (click)="closeDetails()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="overlay-section">
+      <div class="overlay-label">Guest</div>
+      <div>
+        <div class="overlay-value">{{ event.attendeeName }}</div>
+        <div class="overlay-muted" *ngIf="event.attendeeEmail">{{ event.attendeeEmail }}</div>
+      </div>
+    </div>
+    <div class="overlay-section" *ngIf="event.notes">
+      <div class="overlay-label">Notes</div>
+      <div class="overlay-value">{{ event.notes }}</div>
+    </div>
+    <div class="overlay-section" *ngIf="event.userInput">
+      <div class="overlay-label">Responses</div>
+      <div class="overlay-value">
+        <div class="overlay-muted" *ngFor="let entry of (event.userInput | keyvalue)">
+          <span class="overlay-key">{{ entry.key?.toString() | titlecase }}:</span>
+          <span>{{ entry.value }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #loadingState>
+  <div class="loading-state">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading calendar…</p>
+  </div>
+</ng-template>

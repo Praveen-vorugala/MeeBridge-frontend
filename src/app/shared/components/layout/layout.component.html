@@ -23,14 +23,23 @@
         <mat-icon class="mr-3" [class.text-green-600]="!isActive('/builder')" [class.text-green-700]="isActive('/builder')">build</mat-icon>
         <span [class.text-gray-700]="!isActive('/builder')" [class.text-green-900]="isActive('/builder')">Page Builder</span>
       </a>
-      <a mat-list-item routerLink="/calendar" routerLinkActive="active"
+      <a mat-list-item routerLink="/calendar/schedule" routerLinkActive="active"
          class="mb-1 rounded-lg transition-all duration-200"
-         [class.bg-blue-100]="isActive('/calendar')"
-         [class.text-blue-700]="isActive('/calendar')"
-         [class.hover:bg-blue-50]="!isActive('/calendar')"
-         [class.font-semibold]="isActive('/calendar')">
-        <mat-icon class="mr-3" [class.text-blue-600]="!isActive('/calendar')" [class.text-blue-700]="isActive('/calendar')">calendar_today</mat-icon>
-        <span [class.text-gray-700]="!isActive('/calendar')" [class.text-blue-900]="isActive('/calendar')">Availability</span>
+         [class.bg-blue-100]="isActive('/calendar/schedule')"
+         [class.text-blue-700]="isActive('/calendar/schedule')"
+         [class.hover:bg-blue-50]="!isActive('/calendar/schedule')"
+         [class.font-semibold]="isActive('/calendar/schedule')">
+        <mat-icon class="mr-3" [class.text-blue-600]="!isActive('/calendar/schedule')" [class.text-blue-700]="isActive('/calendar/schedule')">calendar_month</mat-icon>
+        <span [class.text-gray-700]="!isActive('/calendar/schedule')" [class.text-blue-900]="isActive('/calendar/schedule')">Calendar</span>
+      </a>
+      <a mat-list-item routerLink="/calendar/availability" routerLinkActive="active"
+         class="mb-1 rounded-lg transition-all duration-200"
+         [class.bg-sky-100]="isActive('/calendar/availability')"
+         [class.text-sky-700]="isActive('/calendar/availability')"
+         [class.hover:bg-sky-50]="!isActive('/calendar/availability')"
+         [class.font-semibold]="isActive('/calendar/availability')">
+        <mat-icon class="mr-3" [class.text-sky-600]="!isActive('/calendar/availability')" [class.text-sky-700]="isActive('/calendar/availability')">event_available</mat-icon>
+        <span [class.text-gray-700]="!isActive('/calendar/availability')" [class.text-sky-900]="isActive('/calendar/availability')">Availability</span>
       </a>
       <a mat-list-item routerLink="/admin/dashboard" routerLinkActive="active" 
          class="mb-1 rounded-lg transition-all duration-200"

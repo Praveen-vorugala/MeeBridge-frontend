@@ -1,0 +1,293 @@
+.calendar-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calendar-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.week-range {
+  display: block;
+  color: #6b7280;
+}
+
+.header-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.calendar-content {
+  display: flex;
+  gap: 24px;
+  position: relative;
+}
+
+.calendar-grid {
+  flex: 1 1 auto;
+  display: flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  overflow: hidden;
+  min-height: 600px;
+}
+
+.time-column {
+  width: 60px;
+  border-right: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding-top: 64px;
+  box-sizing: border-box;
+}
+
+.time-cell {
+  height: calc(60px * 0.8);
+  padding: 4px 8px 4px 4px;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.day-columns {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(120px, 1fr));
+  flex: 1;
+}
+
+.day-column {
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+}
+
+.day-column:last-child {
+  border-right: none;
+}
+
+.day-header {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  text-align: center;
+}
+
+.day-name {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.day-date {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.day-body {
+  position: relative;
+  flex: 1;
+  background: #ffffff;
+}
+
+.hour-guides {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.hour-line {
+  height: calc(60px * 0.8);
+  border-top: 1px dashed rgba(229, 231, 235, 0.65);
+}
+
+.events {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.event-card {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  background: linear-gradient(145deg, #fde68a, #f59e0b);
+  color: #1f2937;
+  border-radius: 12px;
+  padding: 8px 10px;
+  box-shadow: 0 8px 16px rgba(249, 115, 22, 0.15);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  overflow: hidden;
+  border-left: 4px solid rgba(245, 158, 11, 0.8);
+}
+
+.event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(249, 115, 22, 0.25);
+}
+
+.event-title {
+  font-weight: 600;
+}
+
+.event-attendee,
+.event-time {
+  font-size: 0.75rem;
+  color: rgba(31, 41, 55, 0.8);
+}
+
+.event-details {
+  width: 320px;
+  flex-shrink: 0;
+  align-self: flex-start;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.details-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.details-header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.details-section {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.details-section .label {
+  width: 80px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.details-section .value {
+  flex: 1;
+  color: #374151;
+}
+
+.details-section .muted {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.details-section .key {
+  font-weight: 600;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 12px;
+  color: #6b7280;
+}
+
+.calendar-overlay-backdrop {
+  background: rgba(17, 24, 39, 0.35);
+}
+
+.calendar-overlay-panel {
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+}
+
+.overlay-card {
+  width: 340px;
+  max-width: 90vw;
+  background: #ffffff;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.overlay-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.overlay-header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.overlay-section {
+  display: flex;
+  gap: 12px;
+}
+
+.overlay-label {
+  width: 80px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.overlay-value {
+  flex: 1;
+  color: #374151;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.overlay-muted {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.overlay-key {
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+@media (max-width: 1024px) {
+  .calendar-wrapper {
+    padding: 16px;
+  }
+}

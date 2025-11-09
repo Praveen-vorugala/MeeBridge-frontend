@@ -10,15 +10,19 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatListModule } from '@angular/material/list';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { RouterModule } from '@angular/router';
 
 import { CalendarRoutingModule } from './calendar-routing.module';
 import { AvailabilityComponent } from './availability/availability.component';
 import { SharedModule } from '../shared/shared.module';
+import { MeetingCalendarComponent } from './meeting-calendar/meeting-calendar.component';
 
 @NgModule({
   declarations: [
-    AvailabilityComponent
+    AvailabilityComponent,
+    MeetingCalendarComponent
   ],
   imports: [
     CommonModule,
@@ -34,6 +38,8 @@ import { SharedModule } from '../shared/shared.module';
     MatListModule,
     MatChipsModule,
     MatIconModule,
+    MatProgressSpinnerModule,
+    OverlayModule,
     SharedModule
   ]
 })
