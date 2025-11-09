@@ -12,6 +12,12 @@ interface TimezoneOption {
   label: string;
 }
 
+interface RequiredFieldDefinition {
+  name: string;
+  label: string;
+  type: FieldConfig['type'];
+}
+
 @Component({
   selector: 'app-public-booking',
   templateUrl: './public-booking.component.html',
@@ -27,8 +33,14 @@ export class PublicBookingComponent implements OnInit {
   loading = true;
   submitted = false;
   minBookingDate = new Date();
+  maxBookingDate = this.computeMaxBookingDate(3);
   currentStep = 1;
   private readonly defaultTimezone = 'Asia/Kolkata';
+  readonly defaultDescription = 'Please pick a convenient date and time to schedule your meeting.';
+  private readonly requiredFieldDefinitions: RequiredFieldDefinition[] = [
+    { name: 'name', label: 'Full Name', type: 'text' },
+    { name: 'email', label: 'Email Address', type: 'email' }
+  ];
 
   timezones: TimezoneOption[] = [
     { value: 'UTC', label: 'UTC' },
@@ -77,7 +89,8 @@ export class PublicBookingComponent implements OnInit {
   loadMeetingPage(slug: string): void {
     this.meetingPageService.getMeetingPageBySlug(slug).subscribe({
       next: (page) => {
-        this.meetingPage = page;
+        const normalizedFields = this.ensureRequiredFields(page.fields || []);
+        this.meetingPage = { ...page, fields: normalizedFields };
         this.buildForm();
         this.resetSelection();
         this.loading = false;
@@ -93,7 +106,9 @@ export class PublicBookingComponent implements OnInit {
     if (!this.meetingPage) return;
 
     const formControls: Record<string, any> = {};
-    this.meetingPage.fields.forEach((field: FieldConfig) => {
+    const fields = this.ensureRequiredFields(this.meetingPage.fields || []);
+    this.meetingPage = { ...this.meetingPage, fields };
+    fields.forEach((field: FieldConfig) => {
       const validators = field.required ? [Validators.required] : [];
       formControls[field.name] = ['', validators];
     });
@@ -258,7 +273,10 @@ export class PublicBookingComponent implements OnInit {
     if (isNaN(d.getTime())) {
       return '';
     }
-    return d.toISOString().split('T')[0];
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private resetSelection(): void {
@@ -302,5 +320,44 @@ export class PublicBookingComponent implements OnInit {
     const suffix = hours24 >= 12 ? 'PM' : 'AM';
     const hours12 = ((hours24 + 11) % 12) + 1;
     return `${hours12}:${minutes.toString().padStart(2, '0')} ${suffix}`;
+  }
+
+  private computeMaxBookingDate(monthsAhead: number): Date {
+    const max = new Date();
+    max.setHours(23, 59, 59, 999);
+    max.setMonth(max.getMonth() + monthsAhead);
+    return max;
+  }
+
+  private ensureRequiredFields(fields: FieldConfig[]): FieldConfig[] {
+    const result: FieldConfig[] = [];
+    const remaining = [...fields];
+
+    this.requiredFieldDefinitions.forEach((def, index) => {
+      const existingIndex = remaining.findIndex(f => (f.name || '').toLowerCase() === def.name);
+      const existing = existingIndex >= 0 ? remaining.splice(existingIndex, 1)[0] : undefined;
+      const ensured: FieldConfig = {
+        id: existing?.id || this.generateId(),
+        type: def.type,
+        label: existing?.label || def.label,
+        name: def.name,
+        required: true,
+        options: undefined,
+        placeholder: existing?.placeholder || '',
+        order: index
+      };
+      result.push(ensured);
+    });
+
+    const others = remaining.map((field, idx) => ({
+      ...field,
+      order: result.length + idx
+    }));
+
+    return [...result, ...others];
+  }
+
+  private generateId(): string {
+    return 'field_' + Math.random().toString(36).substr(2, 9);
   }
 }

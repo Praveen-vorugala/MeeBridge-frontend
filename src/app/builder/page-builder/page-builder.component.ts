@@ -4,6 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { MeetingPageService } from '../../core/services/meeting-page.service';
 import { MeetingPage, FieldConfig } from '../../core/interfaces/meeting-page.interface';
 
+interface RequiredFieldDefinition {
+  name: string;
+  label: string;
+  type: FieldConfig['type'];
+}
+
 @Component({
   selector: 'app-page-builder',
   templateUrl: './page-builder.component.html',
@@ -17,6 +23,11 @@ export class PageBuilderComponent implements OnInit {
   loading = false;
   selectedPageLoading = false;
   private initialPageId: string | null = null;
+
+  private readonly requiredFieldDefinitions: RequiredFieldDefinition[] = [
+    { name: 'name', label: 'Full Name', type: 'text' },
+    { name: 'email', label: 'Email Address', type: 'email' }
+  ];
 
   constructor(
     private meetingPageService: MeetingPageService,
@@ -61,6 +72,7 @@ export class PageBuilderComponent implements OnInit {
           this.initialPageId = null;
         } else {
           this.resetFormForNewPage();
+          this.setFormFields(this.ensureRequiredFields([]));
         }
       },
       error: (err) => {
@@ -85,7 +97,7 @@ export class PageBuilderComponent implements OnInit {
         this.applySelectedPage(page);
         const index = this.meetingPages.findIndex(p => p.id === page.id);
         if (index !== -1) {
-          this.meetingPages[index] = page;
+          this.meetingPages[index] = { ...page, fields: this.ensureRequiredFields(page.fields || []) };
         }
       },
       error: (err) => {
@@ -97,7 +109,8 @@ export class PageBuilderComponent implements OnInit {
   }
 
   private applySelectedPage(page: MeetingPage): void {
-    this.selectedPage = page;
+    const normalizedFields = this.ensureRequiredFields(page.fields || []);
+    this.selectedPage = { ...page, fields: normalizedFields };
 
     const themeValue = page.theme || {
       primaryColor: '#667eea',
@@ -114,13 +127,7 @@ export class PageBuilderComponent implements OnInit {
       theme: themeValue
     });
 
-    const fieldsArray = this.pageForm.get('fields') as FormArray;
-    fieldsArray.clear();
-    if (page.fields && Array.isArray(page.fields)) {
-      page.fields.forEach(field => {
-        fieldsArray.push(this.createFieldFormGroup(field));
-      });
-    }
+    this.setFormFields(normalizedFields);
   }
 
   private resetFormForNewPage(): void {
@@ -135,11 +142,58 @@ export class PageBuilderComponent implements OnInit {
         primaryColor: '#667eea',
         accentColor: '#764ba2',
         buttonStyle: 'rounded'
-      },
-      fields: []
+      }
     });
     const fieldsArray = this.pageForm.get('fields') as FormArray;
     fieldsArray.clear();
+  }
+
+  private setFormFields(fields: FieldConfig[]): void {
+    const fieldsArray = this.fieldsArray;
+    fieldsArray.clear();
+    fields.forEach(field => fieldsArray.push(this.createFieldFormGroup(field)));
+  }
+
+  private ensureRequiredFields(fields: FieldConfig[]): FieldConfig[] {
+    const result: FieldConfig[] = [];
+    const remaining = [...fields];
+
+    this.requiredFieldDefinitions.forEach((def, index) => {
+      const existingIndex = remaining.findIndex(f => (f.name || '').toLowerCase() === def.name);
+      const existing = existingIndex >= 0 ? remaining.splice(existingIndex, 1)[0] : undefined;
+      const ensured: FieldConfig = {
+        id: existing?.id || this.generateId(),
+        type: def.type,
+        label: existing?.label || def.label,
+        name: def.name,
+        required: true,
+        options: undefined,
+        placeholder: existing?.placeholder || '',
+        order: index
+      };
+      result.push(ensured);
+    });
+
+    const others = remaining.map((field, idx) => ({
+      ...field,
+      order: result.length + idx
+    }));
+
+    return [...result, ...others];
+  }
+
+  private isSystemFieldName(name?: string | null): boolean {
+    if (!name) {
+      return false;
+    }
+    const normalized = name.toLowerCase();
+    return this.requiredFieldDefinitions.some(def => def.name === normalized);
+  }
+
+  isSystemFieldControl(index: number): boolean {
+    const control = this.fieldsArray.at(index);
+    const name = control?.get('name')?.value;
+    return this.isSystemFieldName(name);
   }
 
   createFieldFormGroup(field?: FieldConfig): FormGroup {
@@ -186,7 +240,11 @@ export class PageBuilderComponent implements OnInit {
   }
 
   removeField(index: number): void {
+    if (this.isSystemFieldControl(index)) {
+      return;
+    }
     this.fieldsArray.removeAt(index);
+    this.updateFieldOrders();
   }
 
   savePage(): void {
@@ -203,11 +261,24 @@ export class PageBuilderComponent implements OnInit {
     const formValue = this.pageForm.value;
     // Ensure fields have proper structure
     if (formValue.fields) {
-      formValue.fields = formValue.fields.map((field: any, index: number) => ({
-        ...field,
-        order: index,
-        options: field.type === 'dropdown' && field.options ? field.options : undefined
-      }));
+      formValue.fields = formValue.fields.map((field: any, index: number) => {
+        const adjusted = {
+          ...field,
+          order: index,
+          options: field.type === 'dropdown' && field.options ? field.options : undefined
+        };
+        if (this.isSystemFieldName(adjusted.name)) {
+          const def = this.requiredFieldDefinitions.find(d => d.name === adjusted.name) as RequiredFieldDefinition;
+          adjusted.name = def.name;
+          adjusted.type = def.type;
+          adjusted.required = true;
+          adjusted.options = undefined;
+        }
+        return adjusted;
+      });
+      formValue.fields = this.ensureRequiredFields(formValue.fields);
+    } else {
+      formValue.fields = this.ensureRequiredFields([]);
     }
 
     this.meetingPageService.updateMeetingPage(this.selectedPage.id, formValue).subscribe({
@@ -241,11 +312,24 @@ export class PageBuilderComponent implements OnInit {
 
     // Ensure fields have proper structure
     if (formValue.fields) {
-      formValue.fields = formValue.fields.map((field: any, index: number) => ({
-        ...field,
-        order: index,
-        options: field.type === 'dropdown' && field.options ? field.options : undefined
-      }));
+      formValue.fields = formValue.fields.map((field: any, index: number) => {
+        const adjusted = {
+          ...field,
+          order: index,
+          options: field.type === 'dropdown' && field.options ? field.options : undefined
+        };
+        if (this.isSystemFieldName(adjusted.name)) {
+          const def = this.requiredFieldDefinitions.find(d => d.name === adjusted.name) as RequiredFieldDefinition;
+          adjusted.name = def.name;
+          adjusted.type = def.type;
+          adjusted.required = true;
+          adjusted.options = undefined;
+        }
+        return adjusted;
+      });
+      formValue.fields = this.ensureRequiredFields(formValue.fields);
+    } else {
+      formValue.fields = this.ensureRequiredFields([]);
     }
 
     this.meetingPageService.createMeetingPage(formValue).subscribe({
@@ -266,7 +350,7 @@ export class PageBuilderComponent implements OnInit {
   }
 
   moveFieldUp(index: number): void {
-    if (index > 0) {
+    if (index > 0 && !this.isSystemFieldControl(index) && !this.isSystemFieldControl(index - 1)) {
       const fields = this.fieldsArray;
       const field = fields.at(index);
       fields.removeAt(index);
@@ -276,7 +360,7 @@ export class PageBuilderComponent implements OnInit {
   }
 
   moveFieldDown(index: number): void {
-    if (index < this.fieldsArray.length - 1) {
+    if (index < this.fieldsArray.length - 1 && !this.isSystemFieldControl(index) && !this.isSystemFieldControl(index + 1)) {
       const fields = this.fieldsArray;
       const field = fields.at(index);
       fields.removeAt(index);
@@ -287,7 +371,10 @@ export class PageBuilderComponent implements OnInit {
 
   updateFieldOrders(): void {
     this.fieldsArray.controls.forEach((control, index) => {
-      control.patchValue({ order: index });
+      control.patchValue({ order: index }, { emitEvent: false });
+      if (this.isSystemFieldName(control.get('name')?.value)) {
+        control.patchValue({ required: true }, { emitEvent: false });
+      }
     });
   }
 
@@ -301,6 +388,7 @@ export class PageBuilderComponent implements OnInit {
   createNewPageMode(): void {
     this.initialPageId = null;
     this.resetFormForNewPage();
+    this.setFormFields(this.ensureRequiredFields([]));
   }
 
   updateColorValue(colorType: 'primaryColor' | 'accentColor', value: string): void {

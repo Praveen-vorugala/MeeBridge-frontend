@@ -1,23 +1,49 @@
-.booking-container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 20px;
+:host {
+  display: block;
 }
 
-.full-width {
+:host ::ng-deep .mat-calendar {
   width: 100%;
-  margin-bottom: 15px;
 }
 
-.success-message {
-  text-align: center;
-  padding: 40px;
+:host ::ng-deep .mat-calendar-header {
+  padding: 4px 8px;
 }
 
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
+:host ::ng-deep .mat-calendar-period-button {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+:host ::ng-deep .mat-calendar-table-header {
+  font-size: 0.75rem;
+}
+
+:host ::ng-deep .mat-calendar-body tbody tr {
+  height: auto;
+}
+
+:host ::ng-deep .mat-calendar-body-cell {
+  padding: 2px 0;
+}
+
+:host ::ng-deep .mat-calendar-body-cell-content {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  font-size: 0.85rem;
+}
+
+:host ::ng-deep .mat-calendar-arrow {
+  width: 24px;
+  height: 24px;
+}
+
+.step-card {
+  border-radius: 24px;
+}
+
+.time-slot-button {
+  height: 44px;
 }
 
