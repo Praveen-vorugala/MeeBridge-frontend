@@ -134,20 +134,32 @@ export class PublicBookingComponent implements OnInit {
     this.clearSelectedSlot();
     this.availableSlots = [];
 
-    this.bookingService.getAvailableSlots(this.meetingPage.id, dateIso).subscribe({
+    const duration = this.meetingPage?.duration_minutes || 30;
+    const baseSlots = this.generateFallbackSlots(duration);
+
+    this.bookingService.getAvailableSlots(this.meetingPage.id, dateIso, timezone).subscribe({
       next: (response) => {
         const slots = response?.slots || [];
-        if (slots.length > 0) {
-          this.availableSlots = slots;
-        } else {
-          const duration = this.meetingPage?.duration_minutes || 30;
-          this.availableSlots = this.generateFallbackSlots(duration);
+
+        if (slots.length === 0) {
+          this.availableSlots = baseSlots;
+          return;
         }
+
+        const busyTimes = new Set(
+          slots
+            .filter(slot => (slot.status || '').toLowerCase() !== 'cancelled')
+            .map(slot => this.extractTimeKey(slot.time, timezone))
+            .filter((timeKey): timeKey is string => !!timeKey)
+        );
+
+        const filtered = baseSlots.filter(slot => !busyTimes.has(slot.time));
+
+        this.availableSlots = filtered.length > 0 ? filtered : [];
       },
       error: (err) => {
         console.error('Error loading slots:', err);
-        const duration = this.meetingPage?.duration_minutes || 30;
-        this.availableSlots = this.generateFallbackSlots(duration);
+        this.availableSlots = baseSlots;
       }
     });
   }
@@ -306,6 +318,34 @@ export class PublicBookingComponent implements OnInit {
     }
 
     return slots;
+  }
+
+  private extractTimeKey(isoTime: string, timezone?: string | null): string | null {
+    if (!isoTime) {
+      return null;
+    }
+
+    const date = new Date(isoTime);
+    if (isNaN(date.getTime())) {
+      return null;
+    }
+
+    const tz = timezone || this.slotForm.get('timezone')?.value || this.defaultTimezone;
+    try {
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: tz
+      });
+      const parts = formatter.formatToParts(date);
+      const hour = parts.find(part => part.type === 'hour')?.value ?? '00';
+      const minute = parts.find(part => part.type === 'minute')?.value ?? '00';
+      return `${hour}:${minute}`;
+    } catch (error) {
+      console.warn('Failed to format busy slot time', error);
+      return null;
+    }
   }
 
   private formatTimeValue(totalMinutes: number): string {

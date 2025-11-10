@@ -141,7 +141,7 @@
   z-index: 50;
   height: 64px;
   padding: 0 28px;
-  background: rgba(15, 23, 42, 0.85);
+  /* background: rgba(15, 23, 42, 0.85); */
   backdrop-filter: blur(16px);
   color: #f8fafc;
   display: flex;
@@ -162,7 +162,6 @@
 }
 
 .user-email {
-  color: rgba(226, 232, 240, 0.75);
   font-weight: 500;
 }
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
-import { Booking, Availability, TimeSlot } from '../interfaces/booking.interface';
+import { Booking, Availability, TimeSlot, BusySlot } from '../interfaces/booking.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -33,8 +33,15 @@ export class BookingService {
     return this.apiService.post<Booking>(`bookings/${id}/complete/`, {});
   }
 
-  getAvailableSlots(meetingPageId: string, date: string): Observable<{slots: TimeSlot[]}> {
-    return this.apiService.get<{slots: TimeSlot[]}>(`public/bookings/available-slots/?meeting_page_id=${meetingPageId}&date=${date}`);
+  getAvailableSlots(meetingPageId: string, date: string, timezone?: string): Observable<{slots: BusySlot[]}> {
+    const params = new URLSearchParams({
+      meeting_page_id: meetingPageId,
+      date
+    });
+    if (timezone) {
+      params.append('timezone', timezone);
+    }
+    return this.apiService.get<{slots: TimeSlot[]}>(`public/bookings/available-slots/?${params.toString()}`);
   }
 
   getAvailabilities(): Observable<Availability[]> {

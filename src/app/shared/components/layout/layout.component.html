@@ -62,13 +62,13 @@
   </mat-sidenav>
 
   <mat-sidenav-content class="layout-content">
-    <mat-toolbar class="layout-toolbar">
+    <mat-toolbar class="layout-toolbar bg-gradient-to-r from-emerald-500 to-teal-400 ">
       <button mat-icon-button (click)="toggleMenu()" class="toolbar-toggle" aria-label="Toggle menu">
         <mat-icon>{{ collapsedSideNav ? 'menu_open' : 'menu' }}</mat-icon>
       </button>
       <span class="toolbar-title">MeeBridge</span>
       <span class="flex-1"></span>
-      <span *ngIf="user" class="user-email hidden md:block">{{ user.email }}</span>
+      <span *ngIf="user" class="user-email hidden md:block text-white ">{{ user.email }}</span>
       <button mat-icon-button [matMenuTriggerFor]="menu" class="profile-button" aria-label="User menu">
         <mat-icon>account_circle</mat-icon>
       </button>

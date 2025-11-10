@@ -34,7 +34,7 @@ export class MeetingCalendarComponent implements OnInit, OnDestroy {
   weekStart: Date = this.getStartOfWeek(new Date());
   readonly dayStartHour = 0;
   readonly dayEndHour = 24;
-  readonly minuteHeight = 0.8; // px per minute
+  readonly minuteHeight = 1; // px per minute
 
   private meetingPageMap = new Map<string, MeetingPage>();
   private overlayRef: OverlayRef | null = null;

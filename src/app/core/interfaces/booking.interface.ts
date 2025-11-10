@@ -28,3 +28,12 @@ export interface TimeSlot {
   display: string;
 }
 
+export interface BusySlot {
+  time: string;
+  status?: string;
+  duration_minutes?: number | null;
+  booking_id?: string;
+  attendee_name?: string | null;
+  attendee_email?: string | null;
+}
+
