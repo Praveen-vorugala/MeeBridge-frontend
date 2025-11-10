@@ -42,4 +42,21 @@ export class CustomerDetailComponent implements OnInit {
   goBack(): void {
     this.router.navigate(['/admin/customers']);
   }
+
+  getMetadata(): Record<string, any> {
+    if (!this.customer) {
+      return {};
+    }
+    const meta = this.customer.metadata ?? this.customer.meta_data ?? this.customer.user_input ?? {};
+    return meta && typeof meta === 'object' ? meta : {};
+  }
+
+  getMetadataEntries(): { key: string; value: any }[] {
+    return Object.entries(this.getMetadata()).map(([key, value]) => ({ key, value }));
+  }
+
+  getMetadataField(field: string, fallback: any = null): any {
+    const metadata = this.getMetadata();
+    return metadata[field] ?? fallback;
+  }
 }

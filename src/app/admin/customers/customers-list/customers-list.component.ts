@@ -41,14 +41,34 @@ export class CustomersListComponent implements OnInit {
   onSearch(term: string): void {
     const lowered = term.toLowerCase();
     this.filteredCustomers = this.customers.filter(customer => {
-      const name = customer.attendee_name?.toLowerCase() || '';
-      const email = customer.attendee_email?.toLowerCase() || '';
+      const name = this.getMetadataField(customer, 'name', customer.attendee_name)?.toLowerCase() || '';
+      const email = this.getMetadataField(customer, 'email', customer.attendee_email)?.toLowerCase() || '';
       const meetingTitle = customer.meeting_page_title?.toLowerCase() || '';
-      return name.includes(lowered) || email.includes(lowered) || meetingTitle.includes(lowered);
+      const metaValues = this.extractMetadataValues(customer).join(' ').toLowerCase();
+      return name.includes(lowered) || email.includes(lowered) || meetingTitle.includes(lowered) || metaValues.includes(lowered);
     });
   }
 
   viewCustomer(customer: Customer): void {
     this.router.navigate(['/admin/customers', customer.id]);
+  }
+
+  getMetadata(customer: Customer): Record<string, any> {
+    const meta = customer.metadata ?? customer.meta_data ?? customer.user_input ?? {};
+    return meta && typeof meta === 'object' ? meta : {};
+  }
+
+  getMetadataField(customer: Customer, field: string, fallback: any = null): any {
+    const metadata = this.getMetadata(customer);
+    return metadata[field] ?? fallback;
+  }
+
+  extractMetadataEntries(customer: Customer): { key: string; value: any }[] {
+    const metadata = this.getMetadata(customer);
+    return Object.entries(metadata).map(([key, value]) => ({ key, value }));
+  }
+
+  private extractMetadataValues(customer: Customer): string[] {
+    return this.extractMetadataEntries(customer).map(entry => `${entry.key} ${entry.value}`);
   }
 }

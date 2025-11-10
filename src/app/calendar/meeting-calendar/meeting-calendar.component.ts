@@ -17,6 +17,7 @@ interface MeetingEvent {
   meetingPageId: string;
   notes?: string;
   userInput?: any;
+  meetingLink: string;
 }
 
 @Component({
@@ -38,6 +39,7 @@ export class MeetingCalendarComponent implements OnInit, OnDestroy {
   private meetingPageMap = new Map<string, MeetingPage>();
   private overlayRef: OverlayRef | null = null;
   private readonly fallbackTimezone = 'UTC';
+  private readonly fallbackMeetingLink = 'https://meet.google.com/kro-egve-ssm';
 
   @ViewChild('eventDetailTemplate') eventDetailTemplate!: TemplateRef<any>;
 
@@ -141,6 +143,12 @@ export class MeetingCalendarComponent implements OnInit, OnDestroy {
     this.overlayRef.attach(portal);
   }
 
+  joinMeeting(link: string): void {
+    if (link) {
+      window.open(link, '_blank');
+    }
+  }
+
   closeDetails(): void {
     this.disposeOverlay();
   }
@@ -174,6 +182,7 @@ export class MeetingCalendarComponent implements OnInit, OnDestroy {
     const end = new Date(start.getTime() + duration * 60000);
     const attendeeName = booking.attendee_name || userInput['name'] || userInput['attendee_name'] || 'Guest';
     const attendeeEmail = booking.attendee_email || userInput['email'] || userInput['attendee_email'] || '';
+    const meetingLink = userInput['meeting_link'] || (meetingPage as any)?.meeting_link || this.fallbackMeetingLink;
 
     return {
       id: booking.id,
@@ -184,7 +193,8 @@ export class MeetingCalendarComponent implements OnInit, OnDestroy {
       end,
       meetingPageId: booking.meeting_page,
       notes: booking.notes,
-      userInput: booking.user_input
+      userInput: booking.user_input,
+      meetingLink
     };
   }
 

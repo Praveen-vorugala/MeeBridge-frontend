@@ -11,7 +11,7 @@ import { filter } from 'rxjs/operators';
 })
 export class LayoutComponent implements OnInit {
   user: User | null = null;
-  sidenavOpened = true;
+  collapsedSideNav = true;
   currentRoute: string = '';
 
   constructor(
@@ -30,6 +30,10 @@ export class LayoutComponent implements OnInit {
       this.user = user;
     });
     this.currentRoute = this.router.url;
+  }
+
+  toggleMenu(): void {
+    this.collapsedSideNav = !this.collapsedSideNav;
   }
 
   logout(): void {

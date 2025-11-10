@@ -80,6 +80,15 @@
         </div>
       </div>
     </div>
+    <div class="overlay-section">
+      <div class="overlay-label">Meeting</div>
+      <div class="overlay-value">
+        <a class="overlay-link" [href]="event.meetingLink" target="_blank" rel="noopener noreferrer">{{ event.meetingLink }}</a>
+        <button mat-raised-button color="primary" class="overlay-button" (click)="joinMeeting(event.meetingLink)">
+          Join Meeting
+        </button>
+      </div>
+    </div>
   </div>
 </ng-template>
 

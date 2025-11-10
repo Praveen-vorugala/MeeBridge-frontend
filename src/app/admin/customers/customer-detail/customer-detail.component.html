@@ -10,8 +10,8 @@
 
     <div class="bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
       <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-8 text-white">
-        <h1 class="text-3xl font-bold">{{ customer.attendee_name || 'Customer' }}</h1>
-        <p class="text-indigo-100 mt-1">{{ customer.attendee_email || 'No email provided' }}</p>
+        <h1 class="text-3xl font-bold">{{ getMetadataField('name', customer.attendee_name) || 'Customer' }}</h1>
+        <p class="text-indigo-100 mt-1">{{ getMetadataField('email', customer.attendee_email) || 'No email provided' }}</p>
       </div>
 
       <div class="p-6 md:p-8 space-y-8">
@@ -24,11 +24,15 @@
             </div>
             <div>
               <p class="font-medium text-gray-800">Booking Date</p>
-              <p>{{ customer.booking_date | date:'medium' }}</p>
+              <p>{{ getMetadataField('selected_date', customer.booking_date) | date:'medium' }}</p>
+            </div>
+            <div>
+              <p class="font-medium text-gray-800">Selected Time</p>
+              <p>{{ getMetadataField('selected_time', 'Not provided') }}</p>
             </div>
             <div>
               <p class="font-medium text-gray-800">Time Zone</p>
-              <p>{{ customer.timezone || 'Not provided' }}</p>
+              <p>{{ getMetadataField('timezone', customer.timezone) || 'Not provided' }}</p>
             </div>
             <div>
               <p class="font-medium text-gray-800">Created At</p>
@@ -46,12 +50,12 @@
           <p class="text-gray-700 bg-gray-50 border border-gray-200 rounded-lg p-4">{{ customer.notes }}</p>
         </section>
 
-        <section *ngIf="customer.user_input">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Submitted Form Data</h2>
-          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-700">
-            <div *ngFor="let entry of (customer.user_input | keyvalue)" class="py-2 border-b border-gray-200 last:border-b-0">
-              <span class="font-medium text-gray-800 capitalize">{{ entry.key }}:</span>
-              <span class="ml-2">{{ entry.value }}</span>
+        <section *ngIf="getMetadataEntries().length">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Submitted Details</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div *ngFor="let entry of getMetadataEntries()" class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <p class="text-sm font-medium text-gray-700">{{ entry.key | titlecase }}</p>
+              <p class="text-gray-800 mt-1 break-words">{{ entry.value }}</p>
             </div>
           </div>
         </section>

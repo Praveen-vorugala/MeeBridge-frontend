@@ -8,6 +8,8 @@ export interface Customer {
   timezone?: string;
   notes?: string;
   user_input?: any;
+  metadata?: any;
+  meta_data?: any;
   created_at: string;
   updated_at: string;
 }

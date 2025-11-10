@@ -33,7 +33,7 @@ export class LoginComponent {
       this.authService.login(email, password).subscribe({
         next: (user) => {
           this.loading = false;
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/calendar']);
         },
         error: (err) => {
           this.loading = false;

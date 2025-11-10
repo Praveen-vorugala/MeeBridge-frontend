@@ -286,6 +286,20 @@
   margin-right: 6px;
 }
 
+.overlay-link {
+  color: #2563eb;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.overlay-button {
+  align-self: flex-start;
+  margin-top: 8px;
+  text-transform: none;
+  font-weight: 600;
+}
+
 @media (max-width: 1024px) {
   .calendar-wrapper {
     padding: 16px;
