@@ -84,9 +84,13 @@
       <div class="overlay-label">Meeting</div>
       <div class="overlay-value">
         <a class="overlay-link" [href]="event.meetingLink" target="_blank" rel="noopener noreferrer">{{ event.meetingLink }}</a>
-        <button mat-raised-button color="primary" class="overlay-button" (click)="joinMeeting(event.meetingLink)">
+        <!-- <button mat-raised-button class="overlay-button bg-[#D97D55] " (click)="joinMeeting(event.meetingLink)">
           Join Meeting
-        </button>
+        </button> -->
+        <button type="button" (click)="joinMeeting(event.meetingLink)"
+                  class="inline-flex items-center justify-center h-12 px-6 bg-[#D97D55] text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 transform hover:-translate-y-0.5">
+        Join Meeting
+      </button>
       </div>
     </div>
   </div>

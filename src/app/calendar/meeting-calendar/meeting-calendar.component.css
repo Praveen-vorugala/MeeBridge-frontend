@@ -298,7 +298,13 @@
   margin-top: 8px;
   text-transform: none;
   font-weight: 600;
+  
 }
+
+:host ::ng-deep .overlay-button {
+  background-color: #D97D55;
+}
+
 
 @media (max-width: 1024px) {
   .calendar-wrapper {
