@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MeetingPageService } from '../../core/services/meeting-page.service';
 import { BookingService } from '../../core/services/booking.service';
-import { MeetingPage, FieldConfig } from '../../core/interfaces/meeting-page.interface';
-import { Booking, TimeSlot } from '../../core/interfaces/booking.interface';
+import { MeetingPage, FieldConfig, ThemeConfig } from '../../core/interfaces/meeting-page.interface';
+import { Booking, TimeSlot, BusySlot } from '../../core/interfaces/booking.interface';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CustomerService } from '../../core/services/customer.service';
 
@@ -37,6 +37,17 @@ export class PublicBookingComponent implements OnInit {
   currentStep = 1;
   private readonly defaultTimezone = 'Asia/Kolkata';
   readonly defaultDescription = 'Please pick a convenient date and time to schedule your meeting.';
+  primaryColor = '#4f46e5';
+  accentColor = '#7c3aed';
+  primaryLight = 'rgba(79, 70, 229, 0.1)';
+  accentLight = 'rgba(124, 58, 237, 0.15)';
+  buttonRadiusClass = 'rounded-lg';
+  themeStyles: Record<string, string> = {
+    '--primary-color': this.primaryColor,
+    '--accent-color': this.accentColor,
+    '--primary-light': this.primaryLight,
+    '--accent-light': this.accentLight
+  };
   private readonly requiredFieldDefinitions: RequiredFieldDefinition[] = [
     { name: 'name', label: 'Full Name', type: 'text' },
     { name: 'email', label: 'Email Address', type: 'email' }
@@ -91,6 +102,7 @@ export class PublicBookingComponent implements OnInit {
       next: (page) => {
         const normalizedFields = this.ensureRequiredFields(page.fields || []);
         this.meetingPage = { ...page, fields: normalizedFields };
+        this.applyTheme(page.theme);
         this.buildForm();
         this.resetSelection();
         this.loading = false;
@@ -139,7 +151,7 @@ export class PublicBookingComponent implements OnInit {
 
     this.bookingService.getAvailableSlots(this.meetingPage.id, dateIso, timezone).subscribe({
       next: (response) => {
-        const slots = response?.slots || [];
+        const slots: BusySlot[] = response?.slots || [];
 
         if (slots.length === 0) {
           this.availableSlots = baseSlots;
@@ -171,6 +183,58 @@ export class PublicBookingComponent implements OnInit {
 
   isSlotSelected(slot: TimeSlot): boolean {
     return this.slotForm.get('time')?.value === slot.time;
+  }
+
+  getStepCircleStyles(active: boolean): Record<string, string> {
+    if (active) {
+      return {
+        'background-color': this.primaryColor,
+        'color': '#ffffff',
+        'box-shadow': `0 10px 20px ${this.toRGBA(this.primaryColor, 0.22)}`
+      };
+    }
+    return {
+      'background-color': this.accentLight,
+      'color': this.primaryColor
+    };
+  }
+
+  getStepLabelStyles(active: boolean): Record<string, string> {
+    return active ? { 'color': this.primaryColor } : { 'color': '#475569' };
+  }
+
+  getSlotStyles(slot: TimeSlot): Record<string, string> {
+    const selected = this.isSlotSelected(slot);
+    if (selected) {
+      return {
+        'background-color': this.primaryColor,
+        'color': '#ffffff',
+        'border-color': this.primaryColor,
+        'box-shadow': `0 12px 24px ${this.toRGBA(this.primaryColor, 0.2)}`
+      };
+    }
+    return {
+      'color': this.primaryColor,
+      'border-color': this.accentLight,
+      'background-color': '#ffffff'
+    };
+  }
+
+  getPrimaryButtonStyles(disabled: boolean): Record<string, string> {
+    return {
+      'background': `linear-gradient(135deg, ${this.primaryColor}, ${this.accentColor})`,
+      'color': '#ffffff',
+      'border-color': this.primaryColor,
+      'opacity': disabled ? '0.7' : '1'
+    };
+  }
+
+  getSecondaryButtonStyles(): Record<string, string> {
+    return {
+      'border-color': this.accentLight,
+      'color': this.primaryColor,
+      'background-color': '#ffffff'
+    };
   }
 
   continueToStep2(): void {
@@ -318,6 +382,65 @@ export class PublicBookingComponent implements OnInit {
     }
 
     return slots;
+  }
+
+  private applyTheme(theme?: ThemeConfig): void {
+    const primary = theme?.primaryColor || this.primaryColor;
+    const accent = theme?.accentColor || this.accentColor;
+    this.primaryColor = primary;
+    this.accentColor = accent;
+    this.primaryLight = this.toRGBA(primary, 0.12);
+    this.accentLight = this.toRGBA(accent, 0.18);
+    this.buttonRadiusClass = this.mapButtonStyle(theme?.buttonStyle);
+    this.themeStyles = {
+      '--primary-color': this.primaryColor,
+      '--accent-color': this.accentColor,
+      '--primary-light': this.primaryLight,
+      '--accent-light': this.accentLight
+    };
+  }
+
+  private mapButtonStyle(style?: string): string {
+    switch ((style || '').toLowerCase()) {
+      case 'pill':
+      case 'rounded-full':
+        return 'rounded-full';
+      case 'square':
+      case 'minimal':
+        return 'rounded-md';
+      case 'rounded':
+      default:
+        return 'rounded-lg';
+    }
+  }
+
+  private toRGBA(color: string, alpha: number): string {
+    if (!color) {
+      return `rgba(79, 70, 229, ${alpha})`;
+    }
+
+    let hex = color.trim();
+    if (hex.startsWith('#')) {
+      hex = hex.slice(1);
+    }
+
+    if (hex.length === 3) {
+      hex = hex.split('').map(ch => ch + ch).join('');
+    }
+
+    if (hex.length !== 6) {
+      return `rgba(79, 70, 229, ${alpha})`;
+    }
+
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+
+    if ([r, g, b].some(channel => Number.isNaN(channel))) {
+      return `rgba(79, 70, 229, ${alpha})`;
+    }
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
   private extractTimeKey(isoTime: string, timezone?: string | null): string | null {

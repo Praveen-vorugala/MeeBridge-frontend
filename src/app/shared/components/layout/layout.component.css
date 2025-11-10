@@ -88,19 +88,24 @@
 }
 
 .menu-item:hover {
-  background: #f1f5f9;
+  background: #FCE1D0;
   transform: translateX(4px);
 }
 
 .menu-item.active-item {
-  background: #e0e7ff;
+  background: #FCE1D0;
   color: #312e81;
   box-shadow: 0 10px 22px rgba(79, 70, 229, 0.12);
 }
 
 .menu-icon {
   font-size: 22px;
-  color: inherit;
+  color: #D97D55;
+  transition: color 0.18s ease;
+}
+
+.menu-item.active-item .menu-icon {
+  color: #D97D55;
 }
 
 .menu-label {
@@ -147,7 +152,6 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
 }
 
 .toolbar-toggle {
@@ -168,7 +172,13 @@
 .profile-button mat-icon {
   color: #f8fafc;
 }
-
+:host ::ng-deep .mat-mdc-list-item-unscoped-content{
+      display: flex;
+      align-items: center;
+    }
+    :host ::ng-deep .menu-collapsed .mat-mdc-list-item-unscoped-content{
+      justify-content: center;
+    }
 .content-area {
   flex: 1;
   padding: 28px;

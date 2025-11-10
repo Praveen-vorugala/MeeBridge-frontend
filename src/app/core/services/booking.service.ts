@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
-import { Booking, Availability, TimeSlot, BusySlot } from '../interfaces/booking.interface';
+import { Booking, Availability, BusySlot } from '../interfaces/booking.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +41,7 @@ export class BookingService {
     if (timezone) {
       params.append('timezone', timezone);
     }
-    return this.apiService.get<{slots: TimeSlot[]}>(`public/bookings/available-slots/?${params.toString()}`);
+    return this.apiService.get<{slots: BusySlot[]}>(`public/bookings/available-slots/?${params.toString()}`);
   }
 
   getAvailabilities(): Observable<Availability[]> {
